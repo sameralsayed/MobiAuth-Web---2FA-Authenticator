@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MobiAuth Web - Free 2FA Authenticator. Generate secure TOTP &amp; HOTP codes in your browser. Encrypted vault, password protection, QR import, cloud backup simulation, offline 2FA. Just like the original MobiAuth app.">
+    <meta name="keywords" content="2fa authenticator web, totp generator online, 2fa app browser, mobiauth web, mfa token generator, secure 2fa, qr code 2fa, offline authenticator, two factor authentication web">
+    <meta name="author" content="SAMER SAEID">
+    <meta name="robots" content="index, follow">
+    <title>MobiAuth Web • 2FA Authenticator | TOTP Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+<body class="bg-dark text-white">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-success sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 d-flex align-items-center" href="#">
+                <i class="fas fa-shield-alt text-success me-2"></i> MobiAuth
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#tokens">My Tokens</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#add">Add Token</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#backup">Backup</a></li>
+                    <li class="nav-item"><a onclick="lockVault()" class="nav-link btn btn-outline-success px-4 ms-3 fw-semibold" href="#">🔒 Lock Vault</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="home" class="py-5 text-center" style="background: linear-gradient(135deg, #0f2a1f, #1a3c2e);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <h1 class="display-3 fw-bold mb-3">Secure 2FA in Your Browser</h1>
+                    <p class="lead mb-4 fs-4">Generate TOTP &amp; HOTP codes instantly.<br>Encrypted vault • Password protected • Offline ready.<br>Just like MobiAuth on Android — now fully in your browser.</p>
+                    <button onclick="unlockDemo()" class="btn btn-success btn-lg px-5 py-3 shadow-lg fs-5 fw-semibold">
+                        <i class="fas fa-key me-2"></i> OPEN SECURE VAULT
+                    </button>
+                    <div class="mt-4">
+                        <span class="badge bg-success fs-6 px-3 py-2 me-2"><i class="fas fa-lock me-1"></i> AES-256 Encrypted</span>
+                        <span class="badge bg-success fs-6 px-3 py-2"><i class="fas fa-qrcode me-1"></i> QR Import Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOKENS SECTION -->
+    <section id="tokens" class="py-5">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="display-6 fw-bold"><i class="fas fa-list me-3"></i> My Secure Tokens</h2>
+                <button onclick="addRandomToken()" class="btn btn-outline-light"><i class="fas fa-plus"></i> Quick Add</button>
+            </div>
+            
+            <div id="tokensList" class="row g-4"></div>
+        </div>
+    </section>
+
+    <!-- ADD TOKEN SECTION -->
+    <section id="add" class="py-5 bg-black">
+        <div class="container">
+            <h2 class="text-center display-6 fw-bold mb-5">Add New 2FA Token</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card bg-dark border-success text-white">
+                        <div class="card-body p-5">
+                            <ul class="nav nav-pills mb-4" id="addTabs">
+                                <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#qrTab">📱 Scan QR Code</a></li>
+                                <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#manualTab">⌨️ Manual Entry</a></li>
+                            </ul>
+                            
+                            <div class="tab-content">
+                                <!-- QR Tab -->
+                                <div class="tab-pane fade show active" id="qrTab">
+                                    <div class="text-center py-5 border border-2 border-dashed border-success rounded-4" onclick="simulateQRScan()">
+                                        <i class="fas fa-qrcode fa-5x text-success mb-4"></i>
+                                        <h4>Click to simulate QR scan</h4>
+                                        <p class="text-muted">Camera will open (demo mode)</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Manual Tab -->
+                                <div class="tab-pane fade" id="manualTab">
+                                    <form onsubmit="addManualToken(event)">
+                                        <div class="mb-3">
+                                            <label class="form-label">Service Name</label>
+                                            <input id="serviceName" type="text" class="form-control bg-dark text-white border-success" placeholder="Google, GitHub, Microsoft..." value="GitHub" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Account / Email</label>
+                                            <input id="account" type="text" class="form-control bg-dark text-white border-success" placeholder="you@email.com" value="demo@account.com" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Secret Key (Base32)</label>
+                                            <input id="secretKey" type="text" class="form-control bg-dark text-white border-success" value="JBSWY3DPEHPK3PXP" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100 py-3">ADD TOKEN TO VAULT</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BACKUP SECTION -->
+    <section id="backup" class="py-5">
+        <div class="container">
+            <h2 class="text-center display-6 fw-bold mb-5">Cloud Backup &amp; Recovery</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card bg-dark border-success h-100 text-center p-4">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-success mb-3"></i>
+                        <h4>Backup Vault</h4>
+                        <p class="text-muted">Encrypted backup saved to simulated cloud. One-click restore on any device.</p>
+                        <button onclick="backupVault()" class="btn btn-success mt-3">BACKUP NOW</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-dark border-success h-100 text-center p-4">
+                        <i class="fas fa-cloud-download-alt fa-3x text-success mb-3"></i>
+                        <h4>Restore from Backup</h4>
+                        <p class="text-muted">Import previous backup and recover all tokens instantly.</p>
+                        <button onclick="restoreVault()" class="btn btn-success mt-3">RESTORE VAULT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black text-white py-5 border-top border-success">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; Copyright SAMER SAEID. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        Made by ♥️ <a href="https://bio.link/samer" target="_blank" class="text-success text-decoration-underline">SAMER SAEID</a>
+                    </p>
+                </div>
+            </div>
+            <div class="text-center mt-4 small text-success">
+                SEO Optimized • 100% Responsive • Works on Desktop, Mobile &amp; Tablet • Offline Capable
+            </div>
+        </div>
+    </footer>
+
+    <!-- Vault Password Modal -->
+    <div class="modal fade" id="vaultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-success">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">🔐 Unlock MobiAuth Vault</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">Enter your 4-digit PIN to access encrypted tokens</p>
+                    <input type="password" id="vaultPin" maxlength="4" class="form-control form-control-lg text-center fs-3 bg-dark border-success text-white" value="1234" placeholder="••••">
+                </div>
+                <div class="modal-footer border-0">
+                    <button onclick="checkPin()" class="btn btn-success w-100 py-3">UNLOCK SECURE VAULT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+</html>
